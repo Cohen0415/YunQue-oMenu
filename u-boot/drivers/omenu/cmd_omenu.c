@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 Cohen0415
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include <common.h>
 #include <command.h>
 #include <fs.h>
@@ -25,30 +42,30 @@ static configs_t cfg;
 static void read_line(char *buf, int maxlen)
 {
     int i = 0;
-    while (i < maxlen - 1) 
-	{
+    while (i < maxlen - 1)
+    {
         int ch = getc();
-        
-        if (ch == '\r' || ch == '\n') 
-		{
+
+        if (ch == '\r' || ch == '\n')
+        {
             putc('\n');
             break;
         }
 
-		// 退格键
-        if (ch == 0x7F || ch == 0x08) 
-		{ 
-            if (i > 0) 
-			{
+        // 退格键
+        if (ch == 0x7F || ch == 0x08)
+        {
+            if (i > 0)
+            {
                 i--;
-                puts("\b \b");  // 删除终端上的字符
+                puts("\b \b"); // 删除终端上的字符
             }
             continue;
         }
 
-		// 可见字符
-        if (ch >= 0x20 && ch <= 0x7E) 
-		{ 
+        // 可见字符
+        if (ch >= 0x20 && ch <= 0x7E)
+        {
             buf[i++] = ch;
             putc(ch);
         }
@@ -63,39 +80,39 @@ static void read_line(char *buf, int maxlen)
  *******************************/
 static void get_omenu_config(configs_t *cfg)
 {
-	if (!cfg) 
+    if (!cfg)
     {
-		OMENU_LOG(OMENU_LOG_ERROR, "cfg is NULL\n");
-		return;
-	}
+        OMENU_LOG(OMENU_LOG_ERROR, "cfg is NULL\n");
+        return;
+    }
 
-	memset(cfg, 0, sizeof(configs_t));
+    memset(cfg, 0, sizeof(configs_t));
 
     // Storage Type
     strncpy(cfg->stroage_type, OMENU_STORAGE_DEV, MAX_CFG_LEN - 1);
 
-	// Storage Device Number
+    // Storage Device Number
 #ifdef CONFIG_OMENU_STORAGE_DEV_NUM
-	strncpy(cfg->stroage_dev_num, CONFIG_OMENU_STORAGE_DEV_NUM, MAX_CFG_LEN - 1);
+    strncpy(cfg->stroage_dev_num, CONFIG_OMENU_STORAGE_DEV_NUM, MAX_CFG_LEN - 1);
 #else
-	OMENU_LOG(OMENU_LOG_ERROR, "CONFIG_OMENU_STORAGE_DEV_NUM not defined, using default 0\n");
-	strcpy(cfg->stroage_dev_num, "0");
+    OMENU_LOG(OMENU_LOG_ERROR, "CONFIG_OMENU_STORAGE_DEV_NUM not defined, using default 0\n");
+    strcpy(cfg->stroage_dev_num, "0");
 #endif
 
-	// Storage Partition
+    // Storage Partition
 #ifdef CONFIG_OMENU_STORAGE_PART_NUM
-	strncpy(cfg->stroage_partition, CONFIG_OMENU_STORAGE_PART_NUM, MAX_CFG_LEN - 1);
+    strncpy(cfg->stroage_partition, CONFIG_OMENU_STORAGE_PART_NUM, MAX_CFG_LEN - 1);
 #else
-	OMENU_LOG(OMENU_LOG_ERROR, "CONFIG_OMENU_STORAGE_PART_NUM not defined, using default 0\n");
-	strcpy(cfg->stroage_partition, "0");
+    OMENU_LOG(OMENU_LOG_ERROR, "CONFIG_OMENU_STORAGE_PART_NUM not defined, using default 0\n");
+    strcpy(cfg->stroage_partition, "0");
 #endif
 
-	// Directory Name
+    // Directory Name
 #ifdef CONFIG_OMENU_DIRECTORY_NAME
-	strncpy(cfg->directory_name, CONFIG_OMENU_DIRECTORY_NAME, MAX_CFG_LEN - 1);
+    strncpy(cfg->directory_name, CONFIG_OMENU_DIRECTORY_NAME, MAX_CFG_LEN - 1);
 #else
-	OMENU_LOG(OMENU_LOG_ERROR, "CONFIG_OMENU_DIRECTORY_NAME not defined, using default \"omenu\"\n");
-	strcpy(cfg->directory_name, "omenu");
+    OMENU_LOG(OMENU_LOG_ERROR, "CONFIG_OMENU_DIRECTORY_NAME not defined, using default \"omenu\"\n");
+    strcpy(cfg->directory_name, "omenu");
 #endif
 }
 
@@ -104,10 +121,10 @@ static void get_omenu_config(configs_t *cfg)
  * @param  : path - 路径字符串
  * @return : 1 表示已选中，0 表示未选中
  *******************************/
-static int is_selected(const char *path) 
+static int is_selected(const char *path)
 {
-    for (int i = 0; i < selection_count; i++) 
-	{
+    for (int i = 0; i < selection_count; i++)
+    {
         if (!strcmp(selections[i], path))
             return 1;
     }
@@ -119,12 +136,12 @@ static int is_selected(const char *path)
  * @param  : path - 路径字符串
  * @return : 无
  *******************************/
-static void toggle_selection(const char *path) 
+static void toggle_selection(const char *path)
 {
-    for (int i = 0; i < selection_count; i++) 
-	{
-        if (!strcmp(selections[i], path)) 
-		{
+    for (int i = 0; i < selection_count; i++)
+    {
+        if (!strcmp(selections[i], path))
+        {
             free(selections[i]);
             for (int j = i; j < selection_count - 1; j++)
                 selections[j] = selections[j + 1];
@@ -142,21 +159,21 @@ static void toggle_selection(const char *path)
  * @param  : is_dir - 标记每个条目是否为目录的数组
  * @return : 返回有效条目数量
  *******************************/
-static int parse_list_file(const char *base_path, char *entries[], int is_dir[]) 
+static int parse_list_file(const char *base_path, char *entries[], int is_dir[])
 {
     char file_path[OMENU_MAX_PATH];
     snprintf(file_path, sizeof(file_path), "%s/%s", base_path, OMENU_DIR_FILE_NAME);
 
     char dev_part[10];
     snprintf(dev_part, sizeof(dev_part), "%s:%s", cfg.stroage_dev_num, cfg.stroage_partition);
-    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE)) 
+    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to set blk dev\n");
         return -1;
     }
 
     loff_t file_size;
-    if (fs_size(file_path, &file_size)) 
+    if (fs_size(file_path, &file_size))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to get size of %s\n", file_path);
         return 0;
@@ -165,38 +182,38 @@ static int parse_list_file(const char *base_path, char *entries[], int is_dir[])
     if (file_size == 0)
         return 0;
 
-    if (file_size > 8192) 
+    if (file_size > 8192)
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Invalid file size: %lld\n", file_size);
         return -1;
     }
 
     char *buf = memalign(4, file_size + 1);
-    if (!buf) 
+    if (!buf)
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to allocate buffer\n");
         return 0;
     }
 
-    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE)) 
+    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to set blk dev\n");
         return -1;
     }
 
     loff_t len;
-    if (fs_read(file_path, (ulong)buf, 0, file_size, &len)) 
+    if (fs_read(file_path, (ulong)buf, 0, file_size, &len))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to read %s\n", file_path);
         free(buf);
         return 0;
     }
 
-    buf[len] = '\0';  // null-terminate
+    buf[len] = '\0'; // null-terminate
 
     int count = 0;
     char *line = strtok(buf, "\r\n");
-    while (line && count < OMENU_MAX_SELECTION) 
+    while (line && count < OMENU_MAX_SELECTION)
     {
         if (line[0] != '#')
         {
@@ -218,8 +235,8 @@ static int parse_list_file(const char *base_path, char *entries[], int is_dir[])
  *******************************/
 static void clear_selections(void)
 {
-    for (int i = 0; i < selection_count; i++) 
-    {   
+    for (int i = 0; i < selection_count; i++)
+    {
         free(selections[i]);
     }
     selection_count = 0;
@@ -236,14 +253,14 @@ static void update_selections(void)
 
     char dev_part[10];
     snprintf(dev_part, sizeof(dev_part), "%s:%s", cfg.stroage_dev_num, cfg.stroage_partition);
-    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE)) 
+    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to set blk dev\n");
         return;
     }
 
     loff_t file_size;
-    if (fs_size(OMENU_SELECTED_FILE_NAME, &file_size)) 
+    if (fs_size(OMENU_SELECTED_FILE_NAME, &file_size))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to get size of %s\n", OMENU_SELECTED_FILE_NAME);
         return;
@@ -252,37 +269,37 @@ static void update_selections(void)
     if (file_size == 0)
         return;
 
-    if (file_size > 8192) 
+    if (file_size > 8192)
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Invalid file size: %lld\n", file_size);
         return;
     }
 
-    char *buf = memalign(4, file_size + 1);  // +1 for '\0'
-    if (!buf) 
+    char *buf = memalign(4, file_size + 1); // +1 for '\0'
+    if (!buf)
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to allocate buffer\n");
         return;
     }
 
-    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE)) 
+    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to set blk dev\n");
         return;
     }
 
     loff_t len;
-    if (fs_read(OMENU_SELECTED_FILE_NAME, (ulong)buf, 0, file_size, &len)) 
+    if (fs_read(OMENU_SELECTED_FILE_NAME, (ulong)buf, 0, file_size, &len))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to read %s\n", OMENU_SELECTED_FILE_NAME);
         free(buf);
         return;
     }
 
-    buf[len] = '\0';  // null-terminate for strtok
+    buf[len] = '\0'; // null-terminate for strtok
 
     char *line = strtok(buf, "\r\n");
-    while (line && selection_count < OMENU_MAX_SELECTION) 
+    while (line && selection_count < OMENU_MAX_SELECTION)
     {
         if (line[0] != '#')
         {
@@ -306,44 +323,44 @@ static void save_selections(void)
 
     char dev_part[10];
     snprintf(dev_part, sizeof(dev_part), "%s:%s", cfg.stroage_dev_num, cfg.stroage_partition);
-    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE)) 
+    if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE))
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to set block device\n");
         return;
     }
 
     int total_size = 0;
-    for (int i = 0; i < selection_count; i++) 
+    for (int i = 0; i < selection_count; i++)
     {
-        if (selections[i]) 
+        if (selections[i])
         {
             total_size += strlen(selections[i]) + 1; // +1 for '\n'
         }
     }
 
-    if (total_size > 4096) 
+    if (total_size > 4096)
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Total selection size exceeds 4096 bytes\n");
         return;
     }
 
-    char *buf = memalign(4, total_size);  
-    if (!buf) 
+    char *buf = memalign(4, total_size);
+    if (!buf)
     {
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to allocate buffer\n");
         return;
     }
 
     size_t offset = 0;
-    for (int i = 0; i < selection_count; i++) 
+    for (int i = 0; i < selection_count; i++)
     {
-        if (!selections[i]) 
+        if (!selections[i])
         {
             continue;
         }
 
         int n = sprintf(buf + offset, "%s\n", selections[i]);
-        if (n <= 0 || offset + n > total_size) 
+        if (n <= 0 || offset + n > total_size)
         {
             OMENU_LOG(OMENU_LOG_ERROR, "Selection list too long or sprintf error!\n");
             free(buf);
@@ -355,11 +372,11 @@ static void save_selections(void)
     ret = fs_write(OMENU_SELECTED_FILE_NAME, (ulong)buf, 0, offset, &len);
     free(buf);
 
-    if (ret != 0 || len != offset) 
+    if (ret != 0 || len != offset)
     {
         OMENU_LOG(OMENU_LOG_INFO, "Failed to write %s (ret=%d, len=%llu)\n", OMENU_SELECTED_FILE_NAME, ret, len);
-    } 
-    else 
+    }
+    else
     {
         OMENU_LOG(OMENU_LOG_INFO, "Saved %d selections to %s\n", selection_count, OMENU_SELECTED_FILE_NAME);
     }
@@ -378,35 +395,35 @@ void omenu_fdt_apply(void)
     char dev_part[10];
     snprintf(dev_part, sizeof(dev_part), "%s:%s", cfg.stroage_dev_num, cfg.stroage_partition);
 
-    for (int i = 0; i < selection_count; i++) 
+    for (int i = 0; i < selection_count; i++)
     {
         const char *dtbo_path = selections[i];
 
         OMENU_LOG(OMENU_LOG_INFO, "Applying overlay: %s\n", dtbo_path);
 
         loff_t len;
-        void *dtbo_buf = memalign(4, OMENU_MAX_DTBO_SIZE);  // 分配 128KB 缓冲区
-        if (!dtbo_buf) 
+        void *dtbo_buf = memalign(4, OMENU_MAX_DTBO_SIZE); // 分配 128KB 缓冲区
+        if (!dtbo_buf)
         {
             OMENU_LOG(OMENU_LOG_ERROR, "Failed to allocate memory for overlay\n");
             return;
         }
-        
-        if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE)) 
+
+        if (fs_set_blk_dev(cfg.stroage_type, dev_part, OMENU_FS_TYPE))
         {
             OMENU_LOG(OMENU_LOG_ERROR, "Failed to set blk dev\n");
             free(dtbo_buf);
             return;
         }
 
-        if (fs_read(dtbo_path, (ulong)dtbo_buf, 0, OMENU_MAX_DTBO_SIZE, &len)) 
+        if (fs_read(dtbo_path, (ulong)dtbo_buf, 0, OMENU_MAX_DTBO_SIZE, &len))
         {
             OMENU_LOG(OMENU_LOG_ERROR, "Failed to read dtbo file: %s\n", dtbo_path);
             free(dtbo_buf);
             continue;
         }
 
-        if (fdt_check_header(dtbo_buf) != 0) 
+        if (fdt_check_header(dtbo_buf) != 0)
         {
             OMENU_LOG(OMENU_LOG_ERROR, "Invalid FDT overlay file: %s\n", dtbo_path);
             free(dtbo_buf);
@@ -416,11 +433,11 @@ void omenu_fdt_apply(void)
         run_command("fdt resize 8192", 0);
 
         int ret = fdt_overlay_apply_verbose(working_fdt, dtbo_buf);
-        if (ret < 0) 
+        if (ret < 0)
         {
             OMENU_LOG(OMENU_LOG_INFO, "Overlay apply failed for %s\n", dtbo_path);
-        } 
-        else 
+        }
+        else
         {
             OMENU_LOG(OMENU_LOG_INFO, "Overlay applied: %s\n", dtbo_path);
         }
@@ -434,7 +451,7 @@ void omenu_fdt_apply(void)
  * @param  : base_path - 当前显示菜单的路径
  * @return : 无
  *******************************/
-static void show_menu(const char *base_path) 
+static void show_menu(const char *base_path)
 {
     char *entries[OMENU_MAX_SELECTION];
     int is_dir[OMENU_MAX_SELECTION];
@@ -445,16 +462,16 @@ static void show_menu(const char *base_path)
         OMENU_LOG(OMENU_LOG_ERROR, "Failed to parse list file in %s/%s\n", base_path, OMENU_DIR_FILE_NAME);
     }
 
-    while (1) 
-	{
-		// 打印菜单
+    while (1)
+    {
+        // 打印菜单
         printf("\n========== %s ==========\n", base_path);
-        for (int i = 0; i < count; i++) 
-		{
+        for (int i = 0; i < count; i++)
+        {
             if (is_dir[i])
                 printf("[%d] %s\n", i + 1, entries[i]);
-            else 
-			{
+            else
+            {
                 char full_path[OMENU_MAX_PATH];
                 snprintf(full_path, sizeof(full_path), "%s/%s", base_path, entries[i]);
                 printf("[%d] [%c] %s\n", i + 1, is_selected(full_path) ? '*' : ' ', entries[i]);
@@ -472,42 +489,42 @@ static void show_menu(const char *base_path)
             printf("[0] return to previous menu\n");
         }
 
-		// 用户输入
+        // 用户输入
         char inbuf[16] = {0};
-		printf("Select: ");
-		read_line(inbuf, sizeof(inbuf));
-		if (inbuf[0] == '\0')
-			continue;
+        printf("Select: ");
+        read_line(inbuf, sizeof(inbuf));
+        if (inbuf[0] == '\0')
+            continue;
 
         // 对顶层目录菜单选项做特殊判断
         if (strcmp(base_path, cfg.directory_name) == 0)
         {
-            if (inbuf[0] == 'q')    // 退出菜单
+            if (inbuf[0] == 'q') // 退出菜单
                 break;
 
-            if (inbuf[0] == 's')    // 保存已选择的插件
+            if (inbuf[0] == 's') // 保存已选择的插件
             {
                 save_selections();
                 continue;
             }
 
-            if (inbuf[0] == 'c')    // 重置选择
+            if (inbuf[0] == 'c') // 重置选择
             {
                 clear_selections();
                 OMENU_LOG(OMENU_LOG_INFO, "Selections cleared\n");
                 continue;
             }
 
-            if (inbuf[0] == 'r')    // 重启系统
+            if (inbuf[0] == 'r') // 重启系统
             {
                 run_command("reboot", 0);
                 continue;
             }
         }
 
-		char *endptr;
-		int sel = simple_strtoul(inbuf, &endptr, 10);
-		
+        char *endptr;
+        int sel = simple_strtoul(inbuf, &endptr, 10);
+
         // 非负整数 输入检查
         if (*endptr != '\0')
             continue;
@@ -520,22 +537,22 @@ static void show_menu(const char *base_path)
         if (sel == 0)
             break;
 
-        if (is_dir[sel - 1]) 
-		{
+        if (is_dir[sel - 1])
+        {
             char new_path[OMENU_MAX_PATH];
             snprintf(new_path, sizeof(new_path), "%s/%s", base_path, entries[sel - 1]);
             show_menu(new_path);
-        } 
-		else 
-		{
+        }
+        else
+        {
             char full_path[OMENU_MAX_PATH];
             snprintf(full_path, sizeof(full_path), "%s/%s", base_path, entries[sel - 1]);
             toggle_selection(full_path);
         }
     }
 
-    for (int i = 0; i < count; i++) 
-	{
+    for (int i = 0; i < count; i++)
+    {
         free(entries[i]);
     }
 }
@@ -546,7 +563,7 @@ static void show_menu(const char *base_path)
  * @return : 0
  *******************************/
 static int do_omenu(struct cmd_tbl_s *cmdtp, int flag, int argc, char *const argv[])
-{  
+{
     // 获取配置
     get_omenu_config(&cfg);
     OMENU_LOG(OMENU_LOG_DEBUG, "OMENU Version: %s\n", OMENU_VERSION);
@@ -565,13 +582,12 @@ static int do_omenu(struct cmd_tbl_s *cmdtp, int flag, int argc, char *const arg
     update_selections();
 
     // 菜单解析
-	show_menu(cfg.directory_name);
-    
-	return 0;
+    show_menu(cfg.directory_name);
+
+    return 0;
 }
 
 U_BOOT_CMD(
-	omenu, 1, 0, do_omenu,
-	"oMenu - interactive device tree overlay selection menu",
-	"oMenu - interactive device tree overlay selection menu"
-);
+    omenu, 1, 0, do_omenu,
+    "oMenu - interactive device tree overlay selection menu",
+    "oMenu - interactive device tree overlay selection menu");
