@@ -78,7 +78,7 @@ Select: r
 获取源码：
 
 ```shell
-git clone git@github.com:Cohen0415/oMenu.git
+git clone https://github.com/Cohen0415/YunQue-oMenu.git
 ```
 
 ```shell
