@@ -97,10 +97,10 @@ oMenu
         └── omenu	# oMenu源码
 ```
 
-复制`oMenu/u-boot/drivers/omenu`目录到你U-Boot源码的相应位置：
+复制`YunQue-oMenu/u-boot/drivers/omenu`目录到你U-Boot源码的相应位置：
 
 ```shell
-cp -r oMenu/u-boot/drivers/omenu <your_uboot>/drivers/ 
+cp -r YunQue-oMenu/u-boot/drivers/omenu <your_uboot>/drivers/ 
 ```
 
 修改`<your_uboot>/drivers/Makefile`，在合适位置添加如下内容，使得可以编译oMenu：
