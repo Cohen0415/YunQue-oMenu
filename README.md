@@ -10,13 +10,13 @@
   基于U-Boot的设备树插件选择系统，通过菜单界面选择设备树插件(dtbo)，无需重编内核，动态控制外设启用。
 </p>
 
-## ✨ 特性亮点
+## ✨ 1、特性亮点
 
 - 📦 根据自定义目录结构创建菜单
-- 🛠️ 支持FAT32分区格式的eMMC/U盘存储介质存储你的设备树插件
+- 🛠️ 支持eMMC/U盘存储介质存储你的设备树插件
 - 🧩 与芯片平台低耦合，可快速移植
 
-## 📸 示例演示
+## 📸 2、示例演示
 
 以下展示如何通过oMenu菜单开启I2C-1。系统启动过程中，进入U-Boot命令行，执行`omenu`命令调起菜单：
 
@@ -73,7 +73,9 @@ Select: r
 
 系统重启过程中，会在U-Boot阶段，把刚刚选择的设备树插件覆盖到内核设备树，从而达到通过设备树插件来控制相关外设或功能的开启与关闭。
 
-## 🚀 快速开始
+## 🚀 3、快速开始
+
+### ▶️ 3.1、oMenu 的移植
 
 获取源码：
 
@@ -141,9 +143,28 @@ extern void omenu_fdt_apply(void);
 
 至此，oMenu移植结束。
 
-## ⚙️ oMenu的使用
+### ▶️ 3.2、oMenu 的参数配置
 
-### ▶️ 创建自定义目录
+进入你的uboot menuconfig。进入路径`Device Drivers`，开启oMenu选项：
+
+![](https://i-blog.csdnimg.cn/img_convert/a9610a68a187a38c02de9e0160234856.png)
+
+进入路径`oMenu`：
+
+![](https://i-blog.csdnimg.cn/direct/eb650eb29fd549639b3f754ebacfa5d1.png)
+
++ `Storage Type`：存储介质类型。目前支持u盘和mmc。
++ `Storage Device Number`：u盘或mmc的设备号。比如你的板卡是emmc存储方案，可以在uboot命令行执行`mmc dev`命令查看设备号。若使用u盘，可执行`usb start`，再执行`usb dev`查看设备号。
++ `Storage Partition Number`：分区号。自定义目录存储在设备上的第几个分区。
++ `Directory Name`：自定义目录名称。下文将会介绍。
++ `Default log level`：日志的默认等级。数字越大，等级越高。oMenu会输出小于等于默认等级的所有日志。即当默认等级设置为3时，所有日志将会输出。（在初次使用时，可以先设置成3，方便查看所有调试信息）
+
+## 💻 4、编译U-Boot
+
+当你移植好oMenu，且设置好相关配置后。可以开始重新编译U-Boot，并更新U-Boot到你的板卡。
+
+## ▶️ 5、oMenu 的使用
+### 5.1、创建自定义目录
 
 如下所示创建一个omenu目录，里面按功能类别又创建了子目录，并按类别放入设备树插件。届时呈现的菜单结构会和现在创建的目录结构是一样的。
 
@@ -205,27 +226,7 @@ camera-2.dtbo
 
 ![](https://i-blog.csdnimg.cn/img_convert/847af08badaa61da2ee492a44f8f3c55.png)
 
-### ▶️ oMenu的参数配置
-
-进入你的uboot menuconfig。进入路径`Device Drivers`，开启oMenu选项：
-
-![](https://i-blog.csdnimg.cn/img_convert/a9610a68a187a38c02de9e0160234856.png)
-
-进入路径`oMenu`：
-
-![](https://i-blog.csdnimg.cn/direct/eb650eb29fd549639b3f754ebacfa5d1.png)
-
-+ `Storage Type`：存储介质类型。目前支持u盘和mmc。
-+ `Storage Device Number`：u盘或mmc的设备号。比如你的板卡是emmc存储方案，可以在uboot命令行执行`mmc dev`命令查看设备号。若使用u盘，可执行`usb start`，再执行`usb dev`查看设备号。
-+ `Storage Partition Number`：分区号。目录存储在设备上的第几个分区。（目前只支持fat32类型的分区格式）
-+ `Directory Name`：目录名称。也就是上面创建的自定义目录名称。
-+ `Default log level`：日志的默认等级。数字越大，等级越高。oMenu会输出小于等于默认等级的所有日志。即当默认等级设置为3时，所有日志将会输出。（在初次使用时，可以先设置成3，方便查看所有调试信息）
-
-## 💻 编译U-Boot
-
-当你移植好oMenu，且设置好相关配置后。可以开始重新编译U-Boot，并更新U-Boot到你的板卡。
-
-## 💡 oMenu菜单选项介绍
+### 💡 5.2、oMenu 菜单选项介绍
 
 ```shell
 ========== omenu ==========
@@ -246,11 +247,11 @@ camera-2.dtbo
 
 `[q]`：退出oMenu菜单，返回uboot命令行。
 
-## 📚 dtbo学习参考链接
+## 📚 6、dtbo学习参考链接
 
 关于设备树插件dtbo的生成和应用可以参考：https://blog.csdn.net/CATTLE_L/article/details/139498061
 
-## 📬 联系方式
+## 📬 7、联系方式
 
 如有问题欢迎提 issue，或私聊：
 
